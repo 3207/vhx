@@ -35,6 +35,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.StackPane;
 
+// ------------------------------- vhx class -------------------------- //
 public class vhx extends Application {
     
     Stage stage;
@@ -53,67 +54,82 @@ public class vhx extends Application {
  
     boolean isHorizontal = true; // -- default
         
-    final double Fixed = 50;  // -- used as fixed width or height
-    final double MinRulerSize = 200;
+    double Fixed = 50;  // -- used as fixed width or height
+    double MinRulerSize = 200;
     
     // -- On a Mac, Cmd-H hides the current window
     // -- Cmd-Tab and Tab to restore the java app
     
-    final KeyCombination altH = new KeyCodeCombination( KeyCode.H,
-                                    KeyCombination.ALT_DOWN );
+    KeyCombination altH = new KeyCodeCombination( KeyCode.H,
+                              KeyCombination.ALT_DOWN );
     
-    final KeyCombination ctlH = new KeyCodeCombination( KeyCode.H,
-                                    KeyCombination.CONTROL_DOWN );
+    KeyCombination ctlH = new KeyCodeCombination( KeyCode.H,
+                              KeyCombination.CONTROL_DOWN );
     
-    final KeyCombination metaH = new KeyCodeCombination( KeyCode.H,
-                                     KeyCombination.META_DOWN ); 
+    KeyCombination metaH = new KeyCodeCombination( KeyCode.H,
+                               KeyCombination.META_DOWN ); 
     
-    final KeyCombination altV = new KeyCodeCombination( KeyCode.V,
-                                    KeyCombination.ALT_DOWN );
+    KeyCombination altV = new KeyCodeCombination( KeyCode.V,
+                              KeyCombination.ALT_DOWN );
     
-    final KeyCombination ctlV = new KeyCodeCombination( KeyCode.V,
-                                    KeyCombination.CONTROL_DOWN ); 
+    KeyCombination ctlV = new KeyCodeCombination( KeyCode.V,
+                              KeyCombination.CONTROL_DOWN ); 
         
-    final KeyCombination metaV = new KeyCodeCombination( KeyCode.V,
-                                     KeyCombination.META_DOWN ); 
+    KeyCombination metaV = new KeyCodeCombination( KeyCode.V,
+                               KeyCombination.META_DOWN ); 
     
-    final KeyCombination altX = new KeyCodeCombination( KeyCode.X,
-                                    KeyCombination.ALT_DOWN ); 
+    KeyCombination altX = new KeyCodeCombination( KeyCode.X,
+                              KeyCombination.ALT_DOWN ); 
     
-    final KeyCombination ctlX = new KeyCodeCombination( KeyCode.X,
-                                    KeyCombination.CONTROL_DOWN );
+    KeyCombination ctlX = new KeyCodeCombination( KeyCode.X,
+                              KeyCombination.CONTROL_DOWN );
     
-    final KeyCombination metaX = new KeyCodeCombination( KeyCode.X,
-                                     KeyCombination.META_DOWN ); 
+    KeyCombination metaX = new KeyCodeCombination( KeyCode.X,
+                               KeyCombination.META_DOWN ); 
     
-    final Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
   
-    final Dimension screenSize = toolkit.getScreenSize();
+    Dimension screenSize = toolkit.getScreenSize();
 
-    final double ScreenHeight = ( int )screenSize.getHeight();
-    final double ScreenWidth  = ( int )screenSize.getWidth();  
+    double ScreenHeight = ( int )screenSize.getHeight();
+    double ScreenWidth  = ( int )screenSize.getWidth();  
     
-    // -- give the ruler some space so it isn't touching the screen's edge
-    final double MaxRulerHeight = ( int )( ScreenHeight / 100 ) * 100;  
-    final double MaxRulerWidth  = ( int )( ScreenWidth / 100 ) * 100; 
-    
-    final double Vbuff =  ( ScreenHeight - MaxRulerHeight ) *.50;
-    
+ 
+    double MaxRulerHeight; 
+    double MaxRulerWidth;
+    double Vbuff;
+   
+// -------------------------------- main ---------------------------------  
   public static void main( String[] args ) {
          Application.launch( args );
   }
 
   @Override 
-  public void start( final Stage Primary ) {   
+  public void start( Stage Primary ) {   
     stage = Primary;
- 
+    
+// -- give the ruler some space so it isn't touching the screen's edge  
+    MaxRulerHeight = (int)( ScreenHeight / 100 ) * 100;
+       
+    if ( MaxRulerWidth == ScreenHeight )  {
+         MaxRulerHeight = ScreenHeight - 100;
+    }
+
+    MaxRulerWidth = (int)( ScreenWidth / 100 ) * 100;
+    
+    if ( MaxRulerWidth == ScreenWidth )  {
+         MaxRulerWidth = ScreenWidth - 100;
+    }
+   
+    Vbuff =  ( ScreenHeight - MaxRulerHeight ) *.50; 
+    
     // -- changes thruout
     currentWidth  = MaxRulerWidth;    
     currentHeight = MaxRulerHeight;
  
     // -- default on startup
     horizontalPane = new StackPane();
-    horizontalPane.getChildren().add( makeHorizontal( MaxRulerWidth ) );
+    horizontalPane.getChildren().add( makeHorizontal( MaxRulerWidth ) ); 
  
     scene1 = new Scene( horizontalPane, MaxRulerWidth, Fixed ); 
   
@@ -123,14 +139,15 @@ public class vhx extends Application {
     stage.setAlwaysOnTop( true );
     stage.setOpacity( .75 );
     stage.setX( ( ScreenWidth - MaxRulerWidth ) *.50 );
-    stage.setY( MouseInfo.getPointerInfo().getLocation().y - ( Fixed *.50 ) );
+     
+    stage.setY( testY( MouseInfo.getPointerInfo().getLocation().y ) );
     stage.show();
    
     // -- setup vertical       
     verticalPane = new StackPane();
     scene2 = new Scene( verticalPane, Fixed, MaxRulerHeight );
   
-/////////////////////////// mouse events /////////////////////////////
+// ---------------------------- mouse events -----------------------------
  stage.addEventFilter( MouseEvent.MOUSE_PRESSED, me -> {
     xOffset = me.getSceneX();
     yOffset = me.getSceneY();
@@ -169,7 +186,7 @@ public class vhx extends Application {
     }   
  });   // end mouse events 
 
-//////////////////////////// key events /////////////////////////////    
+// ----------------------------- key events ------------------------------   
  stage.addEventHandler( KeyEvent.KEY_PRESSED, key -> {          
     switch( key.getCode().toString() )  { // -- handle VHX keystrokes 
       case "H": 
@@ -252,7 +269,7 @@ public class vhx extends Application {
     }
   });  // arrow right
  
-///////////////////////////// touchpad events ///////////////////////////  
+// ------------------------------ touchpad -------------------------------  
  horizontalPane.setOnZoom( e -> { 
     e.consume(); 
       if ( currentWidth * e.getZoomFactor() > MinRulerSize && 
@@ -271,7 +288,7 @@ public class vhx extends Application {
         
  }   // -- end start -- //
  
-/////////////////////////////// constrain ///////////////////////////////
+// ------------------------------ contrain -------------------------------
  public double constrain( double drag, double current, double screen, 
                           double buffer )   {
     if ( drag > 0 && drag > ( screen - buffer ) ) {
@@ -284,10 +301,21 @@ public class vhx extends Application {
          return drag;
     }
  }  // constrain
+
+// -------------------------------- test Y -------------------------------
+ public double testY( double y )  { 
+    // -- adjust y as well from going off screen
+    if ( y + Fixed > ScreenHeight ) { 
+         y = ScreenHeight - Fixed;
+    }                   
+    else if ( y < Vbuff || y + Vbuff < Vbuff )  {  
+         y = Vbuff;
+    }
+    return y;
+}  // testY
  
-//////////////////////////////////////////////////////////////////////////
+// -------------------------- set fixed width ----------------------------
  public void setFixedWidth( double width )  {
-//////////////////////////////////////////////////////////////////////////
     if ( !isHorizontal ) {
          verticalPane.getChildren().clear();
          isHorizontal = true;
@@ -297,9 +325,8 @@ public class vhx extends Application {
     setHorizontal();
  }
     
-///////////////////////////////////////////////////////////////////////
+// ---------------------------- set zoom width ---------------------------
  public void setZoomWidth( double zoom )  {
-///////////////////////////////////////////////////////////////////////
     currentWidth = currentWidth * zoom;
      
     if ( currentWidth > MaxRulerWidth ) {
@@ -315,9 +342,8 @@ public class vhx extends Application {
     setHorizontal();
  } 
  
-//////////////////////////////////////////////////////////////////////////
- public void setHorizontal()  {
-//////////////////////////////////////////////////////////////////////////    
+// -------------------------- set horizontal -----------------------------
+ public void setHorizontal()  {    
     double x = MouseInfo.getPointerInfo().getLocation().x;
     double y = MouseInfo.getPointerInfo().getLocation().y - ( Fixed *.50 );            
     
@@ -335,13 +361,7 @@ public class vhx extends Application {
          x = ( ScreenWidth - currentWidth ) - Fixed;
     } 
     
-    // -- adjust y as well from going off screen
-    if ( y + Fixed > ScreenHeight ) { 
-         y = ScreenHeight - Fixed;
-    }                   
-    else if ( y < Vbuff || y + Vbuff < Vbuff )  {  
-         y = Vbuff;
-    }
+    y = testY( y );
      
     stage.setWidth( currentWidth );
     stage.setHeight( Fixed ); 
@@ -351,10 +371,9 @@ public class vhx extends Application {
     
     horizontalPane.getChildren().add( makeHorizontal( currentWidth ) );     
  }
-
-//////////////////////// add a ruler - horizontal ///////////////////////
+ 
+// ---------------------------- make horizontal --------------------------
  public Group makeHorizontal( double width )  {
-//////////////////////////////////////////////////////////////////////////
     Group g = new Group(); 
     // -- locate 50 pixel mark closest to center
     int Xoff = ( int )( ( ( width + 50 ) / 50 ) / 2 ) * 50 ;  
@@ -425,9 +444,9 @@ public class vhx extends Application {
     return g;
   }  // add horz
  
-//////////////////////////////////////////////////////////////////////////
- public void setFixedHeight( double height )  {
-//////////////////////////////////////////////////////////////////////////
+// --------------------------- set fixed height --------------------------
+public void setFixedHeight( double height )  {
+
     if ( isHorizontal ) {     
          horizontalPane.getChildren().clear();
          isHorizontal  = false;
@@ -436,10 +455,9 @@ public class vhx extends Application {
 
     setVertical();
  }
- 
-////////////////////////////////////////////////////////////////////////
- public void setZoomHeight( double zoom )  {
-////////////////////////////////////////////////////////////////////////  
+
+// --------------------------- set zoom height ---------------------------
+ public void setZoomHeight( double zoom )  { 
     currentHeight = currentHeight * zoom;    
     
     if ( currentHeight > MaxRulerHeight ) {
@@ -455,9 +473,8 @@ public class vhx extends Application {
     setVertical();
  } 
 
-////////////////////////////////////////////////////////////////////////
+// --------------------------- set vertical ------------------------------
  public void setVertical()  {
-///////////////////////////////////////////////////////////////////////
     double x = MouseInfo.getPointerInfo().getLocation().x - ( Fixed *.50 ); 
     double y = MouseInfo.getPointerInfo().getLocation().y;
   
@@ -497,9 +514,8 @@ public class vhx extends Application {
     verticalPane.getChildren().add( makeVertical( currentHeight ) );
  }
      
-//////////////////////////// add a ruler ////////////////////////////////
- public Group makeVertical( double height )  {
-/////////////////////////////////////////////////////////////////////////     
+// ----------------------------- make vetical ----------------------------
+ public Group makeVertical( double height )  {     
     Group g = new Group();
     
     Rectangle ruler = new Rectangle( 0, 0, Fixed, height );  
@@ -547,4 +563,4 @@ public class vhx extends Application {
     return g;  
  }  //  add vert
        
-} //////////////////////////////// that's all ////////////////////////
+}// ---------------------------- vhx class ---------------------------- //
